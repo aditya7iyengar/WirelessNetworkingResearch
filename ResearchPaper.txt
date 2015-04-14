@@ -1,0 +1,182 @@
+
+CIS 375
+Wireless Networks Research Paper
+
+Localization Algorithms in Wireless Networks
+
+by: Adi Iyengar
+
+
+
+
+
+
+
+
+CONTENTS
+
+TOPICS											PAGE
+
+Introduction and need for localization . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .   3
+Defining a coordinate system . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .   4
+Bounding Box Algorithm . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .   6
+Beacon based Gradient Algorithm  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .   7
+Beacon Triangular Intersection Algorithm. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .  8
+My approach towards localization . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .  9
+Reason why I chose this topic  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .   13
+References  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .   14
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+INTRODUCTION
+
+“After my experiments with micro-particles, I realized how important and complexed it is to accurately predict the location of ANYthing in the world.”      
+- Werner Heisenberg
+
+
+Location awareness (Localization) is a very important aspect for wireless communication. A lot of information communicated across various networks these days are helpful only in confluence with the location of a particular wireless node in the network.  For example, wireless sensor networks involve various autonomous devices communicating with each other on the basis of physical and environmental situations. Therefore, they need the location of specific nodes in order to detect spatial variations in the environment including temperature and network congestion around the other sensor nodes. Moreover, with the location information about the node, we can facilitate it’s communication with it’s own neighbors in a very efficient way. This can also be used in social networking applications or intruder detection.
+ 
+In Ad hoc sensor networks, the nodes are required to be oriented geographically in a way that all the applications offered by the network is meaningful. Geographical routing, for example, “ is a routing principle that relies on geographic position information. It is mainly proposed for wireless networks and based on the idea that the source sends a message to the geographic location of the destination instead of using the network address.” (Stojmenovic, Ivan) Therefore, in order for it to send the message close to a destination’s geographic location, it needs proper geographic data of the destination, which further calls for localization features in wireless networks.
+
+
+
+So, as we can see in the above paragraphs, location of nodes is slowly becoming a very important information as we make advancements to the technologies that use wireless networks. Therefore, it is extremely important to know the location of the nodes that are part of a Wireless network based on sensors. 
+
+DEFINING A COORDINATE FRAME
+
+	In order to implement localization it is very important that we define a coordinate frame for each node that we plan on localizing (as we need a coordinate frame to base  the position out of). There are two ways in which we can define a coordinate frame: 
+
+First, is by defining a global coordinate frame, such that the localization information is not stored at all nodes but a single centralized node, called the localization server. In this way, each sender can send a confirmation packet to the localization server which will confirm to it the location of the specific destination node and then the sender can send the packet in that specified geographic location. GPS (Global Positioning System) is a great example of a global coordinate frame. There are a few drawbacks of using a global coordinate frame. It is expensive in terms of time. If a node wants to send packet to a node which is three hop counts away, then each of the transit node has to communicate to the localization server in order to send the packet in the correct geographical direction. Moreover, there is also a possibility that the location of the destination node could change by the time the sender node receives a confirmation packet from the server. 
+
+Therefore, for more dynamic wireless systems, we have the second type of coordinate frame known as relative coordinate frame, in which some well defined nodes are placed using rigid transformations along the world coordinate frame. These nodes are called beacon nodes/anchor nodes. These beacon nodes know their coordinate frame relative to the world coordinate frame. This can be done by using a centralized GPS device. And using these beacon nodes we program a relative coordinate frame which will give us the position of each node in the network using the locations of each of these beacon nodes. 
+
+We need at least four non-coplanar beacon nodes to be able to compute each possible coordinate in a 3D space. This is a direct application of theorem of linear transformation of vectors: With four linearly independent vectors we can represent a set which spans an entire 3D coordinate space (as shown below):
+
+
+Linear transformation of four vectors representing the coordinates of four non coplanar nodes, where c1, c2, c3 and c4 are constants. 
+
+	
+This way of defining coordinate frame is more useful in dynamic networks as there are at least four beacon nodes that know the position of a node according to their coordinates, which will make it easier for other nodes to predict the position of the destination nodes and also will be easier to change if there is any change in the position of the destination node. Therefore some of the localization techniques these days use relative coordinate frames. There are however, some drawbacks associated with these as well. Having four or more beacon nodes will skyrocket the power consumption rate of the overall network. Moreover, the beacon nodes cannot be placed indoor as they might get confused by the walls and tall buildings. One other way of overcoming the overhead would be to not use GPS to program the beacon nodes’ location, but hard code the position in the nodes, which would be impractical as we cannot guarantee that the nodes will not change their location according to the world coordinate frame. 
+
+	Therefore, depending upon what’s required by the network we can chose to implement either of the coordinate frames. Now that we have chosen a coordinate frame, we can go ahead and work on predicting the position of a node in a network. 
+
+BOUNDING BOX ALGORITHM
+
+Bounding box algorithm is relatively easier to program due it’s straight forward logic. In this algorithm, each node is wrong in predicting the position of the other node within a boundary called the bounding box. The size of the box depends on the average hop counts to all the beacon nodes. The center of intersection of each bounding box will be the estimated position of the unknown node. 
+
+This algorithm works well if the actual positions of the nodes are closer to the beacon nodes. An advantage of using this algorithm is that it reduces the computational load of a sensor node by a significant amount. So, when other complex algorithms are not feasible, we use bounding box algorithm. 
+
+BEACON BASED GRADIENT ALGORITHM
+
+
+	Beacon based gradient algorithm follows the mathematical computation process of gradients called multilateration. The algorithm says that each of beacon node has a beacon gradient associated with it. This gradient is essentially a distribution that shows the computed shortest path of each node from that particular beacon.
+	
+In this way, beacon gradient for each beacon node is compared and a node always sends message to the beacon it was closest to according to the distribution. This algorithm requires a lot more computation compared to the bounding box algorithm, but has very less error in contrast. Therefore, depending upon the hardware capabilities it could be more helpful to use beacon gradient algorithm over bounding box algorithm. 
+
+
+
+
+BEACON TRIANGULAR INTERSECTION ALGORITHM
+
+
+	In the Beacon Triangular Intersection algorithm, each node creates a beacon triangle which is a triangle created by choosing three arbitrary beacon nodes in the network, and then the node decides whether it is inside the triangle or outside. The node repeats the process for multiple combination of three beacon nodes in the network and then it predicts its coordinate at the center of the intersection of the triangles it is inside. 
+
+ Therefore, the node adds each triangle to it’s list of inside triangles and at the end of the process it computes its position by finding the center of mass of all the triangles in the list of inside triangles.
+
+Experimentally, this algorithm has given better results than the previous two but again, with a trade off of a lot of computation and increase in the calculation time. Therefore, this method is a good method when the nodes are not moving that often, which means there will be less number of times we will have to compute the node’s position.
+
+
+
+
+MY APPROACH TOWARDS LOCALIZATION
+
+	Throughout my research about localization algorithms, I was wondering if we are trying to predict the positions of a node why aren’t we generating a continuous spatial probability function? Well, the reason was that some people have used those functions and the improvement in standard error is not considered worth the cost of implementing such algorithms. Some of such algorithms are Bayesian Algorithm, Conditional localization algorithm etc. Well, I still wanted to come up with an algorithm that uses spatial probability function and gives a better result (both error-wise and power usage wise). 
+	The best spatial probability function known to humans is the Schrodinger’s equation. Therefore, I decided to put some time implementing a spatial probability function for wireless nodes based of off Schrodinger’s equation. 
+
+	Here is the general form of the Schrodinger’s equation:
+  		
+In the equation, the ‘h’ is the plank’s constant, the greek symbol ‘nabla’ represents the laplacian operator and phi represents the position-space wave function. 
+	
+If we could come up with good approximation for the plank’s constant equivalent for wireless networks, then we could possibly make use of this equation. Similarly, for ‘mu’, ‘nabla’ and ‘phi’. So, on the basis of the factors that depend on position (for example instead of momentum and energy, using RSSI) and some sample experimental we can come up with proper equivalents for those variables in the Schrodinger’s equation.
+
+There are multiple factors that depend on position of the receiver node, such as RSSI, hop count, Time of arrival, angle of arrival etc. Therefore, if we are trying to come up with an algorithm to predict the distance we should take all of this into the account. 
+
+RSSI is inversely related to the distance as shown in the graph below.
+
+Looking at the regression curve, we can say that RSSI appears to be related to the Distance as RSSI = k/ln(Distance) + k’ , where k and k’ are constants.
+
+
+
+
+
+
+
+
+Similarly, time of arrival is related to the distance as the following graph shows:
+
+
+	Time of arrival appears to be directly proportional to distance.
+	So, we can say that time = k’’/distance, where k’’ is a constant.
+	
+
+
+
+
+
+
+
+RSSI is related to the angle of arrival as the following graph shows:
+
+So, according to the graph we can say that RSSI = RSSIamplitude * cos (theta,t) - k’’’, where k is another constant.
+
+Therefore, we have enough variables to estimate our equivalents for the constants in the Schrodinger’s equation. The constants that I came up with (After some significant amount research and calculations using Path integrals across the energy side of the schrodinger’s equation, assuming the Hermitian operators are always linear and spreading the limit of 2 for the number of Energy eigenvalues etc etc) are:
+h = a constant that corresponds to energy. = RSS^(3/2)
+nabla can be replaced by k
+Amplitude of phi could be k’’’ and we can think of the equation as only one function which is RSSI.
+mu = 10*log(N/S)
+We can ignore the i as we are not using the partial differentiation across three axis and therefore multiply by the constant on the right side to be consistent with the units, (RSSIamp)*e^(timeOfFlight).
+V (x,t) would correspond to the equation of RSSI with respect to theta and t.
+
+Doing this we should be able to predict accurately the actual spatial probability of finding a particular node corresponding the a region in the 3D space based on the IP address of that node. 
+
+Again, I am not using partial differentiation two functions in this method. Using it will definitely improve the results of the algorithm, but due to time/resources constraints I couldn’t implement it.
+
+Some more algorithms I would look into would be using Richard Feynman's Matrix Mechanics and Euler-Lagrange’s variation of a spatial wave function  to improve this result. 
+
+REASON WHY I CHOSE THIS TOPIC
+
+Localization is a relatively newer and a math-heavy field with a lot of new algorithms, hardware and applications associated with it. Due to all this it has a huge room for improvement and I was curious if I can better the algorithms that are being implemented these days by the sensor networks. My goal for this research was to properly understand some of the proper algorithms that are being used these days, and hopefully come up with a few algorithms of my own to facilitate localization at a reasonable cost.
+
+
+
+
+REFERENCES
+
+Feynman, Richard. Quantum Mechanics. May 1964.
+Stojmenovic, Ivan. Position based routing in ad hoc networks. 2008
+E. Elnahrawy ,X. Li ,R. P. Martin. The Limits of Localization Using Signal Strength: A Comparative Study. April 2004 
+Y. Chen, W. Trappe, R. P. Martin. The Robustness of Localization Algorithms to Signal Strength Attacks: A Comparative Study. 2006 
+Seth Teller and Eric Demaine. Mobile beacon placement. 2004. 
+R. Nagpal, H. Shrobe, and J. Bachrach. Organizing a global coordinate system from local information on an ad hoc sensor network. April 2003.
+Lambert Meertens, and Stephen Fitzpatrick. The Distributed Construction of a Global Coordinate System in a Network of Static Computational Nodes from Inter-Node Distances. July 2004.
+David Moore, John Leonard, Daniela Rus, and Seth Teller. Robust distributed network localization with noisy range measurements, Nov 2004. 	
+A. A. Ahmed, H. Shi, and Y. Shang. Sharp: A new approach to relative localization in wireless sensor networks. June 2005.
+UCLA website for Schrodinger’s equation and it’s derivation:
+ http://www.nyu.edu/classes/tuckerman/adv.chem/lectures/lecture_6/node1.html
+							
+						 					
+				
+		
+
